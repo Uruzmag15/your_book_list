@@ -34,3 +34,9 @@ def login(request):
 	else:
 		form = LoginForm()
 	return render(request, 'litresapp/login.html', {'form': form})
+
+
+def logout(request):
+	response = HttpResponseRedirect('/login/')
+	response.delete_cookie('session')
+	return response
