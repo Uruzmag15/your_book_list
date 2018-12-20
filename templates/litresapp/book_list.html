@@ -1,10 +1,41 @@
+{% extends 'litresapp/index.html' %}
+
 {% block title %}
     <title>Your booklist</title>
 {% endblock %}
 
-{% block body %}
-    <h4><a href="{% url 'logout' %}">LOGOUT</a></h4>
-    <h3>Book list</h3>
+{% block login_logout %}
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+{% endblock %}
 
-    <p>{{ text }}</p>
+
+{% block body %}
+    <h3>Book list</h3>
+    {% for book in booklist.books_list %}
+        <div class="col s12 m7">
+            <div class="card horizontal">
+                <div class="card-image">
+                    <img width="128" height="213" src="{{ book.default_cover }}" alt="{{ book.name }}">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <h5>Название: {{ book.name }}</h5>
+                        <h6>Авторы: {{ book.authors_names }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <ul class="pagination">
+        {% if booklist.previous_page %}
+            <li class="waves-effect"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_left</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% if booklist.previous_page %}
+            <li class="waves-effect"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_right</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+    </ul>
 {% endblock %}

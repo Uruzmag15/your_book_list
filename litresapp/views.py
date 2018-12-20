@@ -1,19 +1,19 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 from .tools import check_and_get_data, api_login
 from .forms import LoginForm
 
 
-def book_list(request):
-	resp_text = check_and_get_data(request)
-	if resp_text:
-		return render(request, 'litresapp/book_list.html', {'text': resp_text})
+def book_list_view(request):
+	booklist = check_and_get_data(request)
+	if booklist:
+		return render(request, 'litresapp/book_list.html', {'booklist': booklist})
 	else:
 		return HttpResponseRedirect('/login/')
 
 
-def login(request):
+def login_view(request):
 	if request.method == 'POST':
 		form = LoginForm(request.POST)
 
@@ -36,7 +36,7 @@ def login(request):
 	return render(request, 'litresapp/login.html', {'form': form})
 
 
-def logout(request):
+def logout_view(request):
 	response = HttpResponseRedirect('/login/')
 	response.delete_cookie('session')
 	return response

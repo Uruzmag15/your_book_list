@@ -1,7 +1,7 @@
 import requests
-import json
 
 from .secret import url1, url2
+from .tools_classes import Book, Booklist
 
 
 def api_login(form):
@@ -17,31 +17,48 @@ def api_login(form):
 	return response
 
 
+def make_booklist(resp_text):
+	"""
+	Формирование объекта Booklist с нужными полями
+	:param resp_text: (dict)
+	:return: (Booklist)
+	"""
+	booklist = Booklist()
+	booklist.next_page = resp_text['meta']['next'] if resp_text['meta']['next'] else ''
+	booklist.previous_page = resp_text['meta']['previous'] if resp_text['meta']['previous'] else ''
+	for obj in resp_text['objects']:
+		book = Book()
+		book.name = obj['book']['name']
+		book.authors_names = obj['book']['authors_names']
+		book.add_cover_url(obj['book']['default_cover'])
+		booklist.books_list.append(book)
+	return booklist
+
+
 def check_and_get_data(request):
 	"""
 	Проверка актуальности cookie сессии в браузере
 	:param request:
-	:return: (dict)
+	:return: (Booklist)
 	"""
-	mb_session_cookie = request.COOKIES.get('session')
-	if not mb_session_cookie:
+	browser_session_cookie = request.COOKIES.get('session')
+	if not browser_session_cookie:
 		return None
 	else:
-		return get_booklist(mb_session_cookie)
+		return get_booklist(browser_session_cookie)
 
 
-def get_booklist(mb_session_cookie):
+def get_booklist(browser_session_cookie):
 	"""
 	API GET запрос списка книг
-	:param mb_session_cookie: сессионная cookie session (str)
-	:return: (dict)
+	:param browser_session_cookie: сессионная cookie session браузера(str)
+	:return: (Booklist)
 	"""
 	ses = requests.Session()
-	ses.cookies.set('session', mb_session_cookie)
+	ses.cookies.set('session', browser_session_cookie)
+	ses.headers['Accept'] = 'application/json;version=5'
 	response = ses.get(url2)
-
-	if mb_session_cookie == response.cookies.get('session'):
+	if browser_session_cookie == response.cookies.get('session'):
 		return None
 	else:
-		# return json.loads(response.text)
-		return response.text
+		return make_booklist(response.json())
