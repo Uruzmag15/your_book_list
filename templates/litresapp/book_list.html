@@ -25,17 +25,19 @@
                 </div>
             </div>
         </div>
+    {% empty %}
+        <p>Empty list</p>
     {% endfor %}
-    <ul class="pagination">
+    <ul class="pagination" style="text-align: center">
         {% if booklist.previous_page %}
-            <li class="waves-effect"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_left</i></a></li>
+            <li class="waves-effect"><a href="{% url 'page' booklist.previous_page %}"><i class="material-icons">chevron_left</i></a></li>
         {% else %}
-            <li class="disabled"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_left</i></a></li>
+            <li class="disabled"><a href=""><i class="material-icons">chevron_left</i></a></li>
         {% endif %}
-        {% if booklist.previous_page %}
-            <li class="waves-effect"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_right</i></a></li>
+        {% if booklist.next_page %}
+            <li class="waves-effect"><a href="{% url 'page' booklist.next_page %}"><i class="material-icons">chevron_right</i></a></li>
         {% else %}
-            <li class="disabled"><a href="{{ booklist.previous_page }}"><i class="material-icons">chevron_right</i></a></li>
+            <li class="disabled"><a href=""><i class="material-icons">chevron_right</i></a></li>
         {% endif %}
     </ul>
 {% endblock %}

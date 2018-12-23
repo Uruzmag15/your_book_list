@@ -1,16 +1,21 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
-from .tools import check_and_get_data, api_login
+from .tools import api_login, get_booklist, make_booklist
 from .forms import LoginForm
 
 
-def book_list_view(request):
-	booklist = check_and_get_data(request)
-	if booklist:
-		return render(request, 'litresapp/book_list.html', {'booklist': booklist})
-	else:
+def book_list_view(request, **kwargs):
+	browser_session_cookie = request.COOKIES.get('session')
+	if not browser_session_cookie:
 		return HttpResponseRedirect('/login/')
+
+	api_response = get_booklist(browser_session_cookie, kwargs.get('cursor'))
+	if not api_response:
+		return HttpResponseRedirect('/login/')
+
+	booklist = make_booklist(api_response)
+	return render(request, 'litresapp/book_list.html', {'booklist': booklist})
 
 
 def login_view(request):
@@ -22,8 +27,15 @@ def login_view(request):
 
 			if api_login_response.status_code == 200:
 				api_session_cookie = api_login_response.cookies.get('session')
+				cks = {
+					'key': 'session',
+					'value': api_session_cookie,
+					'path': '/',
+					'domain': '127.0.0.1',
+					'httponly': True
+				}
 				resp_redir = HttpResponseRedirect('/')
-				resp_redir.set_cookie('session', value=api_session_cookie, httponly=True)
+				resp_redir.set_cookie(**cks)
 				return resp_redir
 
 			elif api_login_response.status_code == 400:
