@@ -39,7 +39,7 @@ def login_view(request):
 				return resp_redir
 
 			elif api_login_response.status_code == 400:
-				return render(request, 'litresapp/login.html', {'form': form, 'error_message': 'Incorrect login/password!'})
+				return render(request, 'litresapp/login.html', {'form': form, 'error_message': 'Неверный логин/пароль!'})
 
 			else:
 				form = LoginForm()
