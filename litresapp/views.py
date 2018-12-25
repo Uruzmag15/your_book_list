@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from .tools import api_login, get_booklist, make_booklist
 from .forms import LoginForm
@@ -8,11 +9,11 @@ from .forms import LoginForm
 def book_list_view(request, **kwargs):
 	browser_session_cookie = request.COOKIES.get('session')
 	if not browser_session_cookie:
-		return HttpResponseRedirect('/login/')
+		return HttpResponseRedirect(reverse('login'))
 
 	api_response = get_booklist(browser_session_cookie, kwargs.get('cursor'))
 	if not api_response:
-		return HttpResponseRedirect('/login/')
+		return HttpResponseRedirect(reverse('login'))
 
 	booklist = make_booklist(api_response)
 	return render(request, 'litresapp/book_list.html', {'booklist': booklist})
@@ -34,7 +35,7 @@ def login_view(request):
 					'domain': '127.0.0.1',
 					'httponly': True
 				}
-				resp_redir = HttpResponseRedirect('/')
+				resp_redir = HttpResponseRedirect(reverse('book_list'))
 				resp_redir.set_cookie(**cks)
 				return resp_redir
 
@@ -49,6 +50,6 @@ def login_view(request):
 
 
 def logout_view(request):
-	response = HttpResponseRedirect('/login/')
+	response = HttpResponseRedirect(reverse('login'))
 	response.delete_cookie('session')
 	return response
